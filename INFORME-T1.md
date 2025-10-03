@@ -1,6 +1,6 @@
 # Tarea 1 — `getppid` y `getancestor` en xv6-riscv
 
-**Autor:** Vicente Echegaray  
+**Autores:** Vicente Echegaray; Lucas Bahamondes  
 **Repositorio (rama):** `https://github.com/Vechegaray23/xv6-riscv/tree/vicente_echegaray_t1`  
 **Fecha:** 21/09/2025
 

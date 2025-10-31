@@ -89,6 +89,10 @@ struct proc {
   enum procstate state;        // Process state
   void *chan;                  // If non-zero, sleeping on chan
   int killed;                  // If non-zero, have been killed
+int tickets;        // cantidad de tickets (>=1)
+uint64 cpu_slices;  // veces seleccionado para RUNNING
+
+
   int xstate;                  // Exit status to be returned to parent's wait
   int pid;                     // Process ID
 

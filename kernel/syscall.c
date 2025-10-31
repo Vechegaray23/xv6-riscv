@@ -104,6 +104,8 @@ extern uint64 sys_close(void);
 // --- NUEVO: declaraciones de tus dos syscalls ---
 extern uint64 sys_getppid(void);
 extern uint64 sys_getancestor(void);
+extern uint64 sys_settickets(void);
+
 
 
 // An array mapping syscall numbers from syscall.h
@@ -133,6 +135,8 @@ static uint64 (*syscalls[])(void) = {
 // --- NUEVO: mapeos de número->función ---
 [SYS_getppid]     sys_getppid,
 [SYS_getancestor] sys_getancestor,
+[SYS_settickets] sys_settickets,
+
 
 };
 

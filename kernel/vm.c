@@ -484,3 +484,106 @@ ismapped(pagetable_t pagetable, uint64 va)
   }
   return 0;
 }
+
+int
+do_mrdprotect(uint64 addr, int len)
+{
+  struct proc *p = myproc();
+  pagetable_t pagetable;
+  uint64 va;
+  int i;
+
+  // len debe ser positivo
+  if(len <= 0)
+    return -1;
+
+  // addr debe estar alineada a página
+  if(addr % PGSIZE != 0)
+    return -1;
+
+  if(p == 0)
+    return -1;
+
+  pagetable = p->pagetable;
+
+  // PRIMER PASO: validar todas las páginas del rango
+  va = addr;
+  for(i = 0; i < len; i++, va += PGSIZE){
+    // no ir más allá del tamaño del proceso
+    if(va >= p->sz)
+      return -1;
+
+    pte_t *pte = walk(pagetable, va, 0);
+    if(pte == 0)
+      return -1;
+
+    // la PTE debe estar válida
+    if((*pte & PTE_V) == 0)
+      return -1;
+
+    // debe ser memoria de usuario, no del kernel
+    if((*pte & PTE_U) == 0)
+      return -1;
+  }
+
+  // SEGUNDO PASO: limpiar el bit de lectura (PTE_R) de cada página
+  va = addr;
+  for(i = 0; i < len; i++, va += PGSIZE){
+    pte_t *pte = walk(pagetable, va, 0);
+    *pte &= ~PTE_R;
+  }
+
+  // asegurar que la TLB vea los nuevos permisos
+  sfence_vma();
+
+  return 0;
+}
+
+int
+do_munrdprotect(uint64 addr, int len)
+{
+  struct proc *p = myproc();
+  pagetable_t pagetable;
+  uint64 va;
+  int i;
+
+  if(len <= 0)
+    return -1;
+
+  if(addr % PGSIZE != 0)
+    return -1;
+
+  if(p == 0)
+    return -1;
+
+  pagetable = p->pagetable;
+
+  // PRIMER PASO: validar todas las páginas del rango
+  va = addr;
+  for(i = 0; i < len; i++, va += PGSIZE){
+    if(va >= p->sz)
+      return -1;
+
+    pte_t *pte = walk(pagetable, va, 0);
+    if(pte == 0)
+      return -1;
+
+    if((*pte & PTE_V) == 0)
+      return -1;
+
+    if((*pte & PTE_U) == 0)
+      return -1;
+  }
+
+  // SEGUNDO PASO: volver a activar el bit de lectura
+  va = addr;
+  for(i = 0; i < len; i++, va += PGSIZE){
+    pte_t *pte = walk(pagetable, va, 0);
+    *pte |= PTE_R;
+  }
+
+  sfence_vma();
+
+  return 0;
+}
+

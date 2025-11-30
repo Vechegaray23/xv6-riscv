@@ -151,5 +151,32 @@ sys_settickets(void)
   release(&p->lock);
   return 0;
 }
+uint64
+sys_mrdprotect(void)
+{
+  uint64 addr;
+  int len;
+
+  // En este xv6, argaddr y argint no retornan int, solo llenan las variables.
+  argaddr(0, &addr);
+  argint(1, &len);
+
+  return do_mrdprotect(addr, len);
+}
+
+uint64
+sys_munrdprotect(void)
+{
+  uint64 addr;
+  int len;
+
+  argaddr(0, &addr);
+  argint(1, &len);
+
+  return do_munrdprotect(addr, len);
+}
+
+
+
 
 
